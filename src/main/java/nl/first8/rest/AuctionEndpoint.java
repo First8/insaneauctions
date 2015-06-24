@@ -1,7 +1,6 @@
 package nl.first8.rest;
 
 import java.util.List;
-import java.util.logging.Logger;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
@@ -22,8 +21,6 @@ import nl.first8.services.MakeBidDto;
 @Path("/auction")
 @RequestScoped
 public class AuctionEndpoint {
-	private static final Logger log = Logger.getLogger(AuctionEndpoint.class.getName());
-
 	@Inject
 	private AuctionService auctionService;
 

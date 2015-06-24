@@ -1,7 +1,5 @@
 package nl.first8.rest;
 
-import java.util.logging.Logger;
-
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
@@ -20,26 +18,24 @@ import nl.first8.services.RegistrationService;
 @Path("/register")
 @RequestScoped
 public class RegistrationEndpoint {
-	private static final Logger log = Logger.getLogger(RegistrationEndpoint.class.getName());
+	@Inject
+	private RegistrationService registrationService;
 
-    @Inject
-    private RegistrationService registrationService;
+	@POST
+	@Produces(MediaType.APPLICATION_JSON)
+	public RegistrationResultDto lookupMemberById(@NotNull @FormParam("nickname") String nickname) {
+		return registrationService.lookupMemberById(nickname);
+	}
 
-    @POST
-    @Produces(MediaType.APPLICATION_JSON)
-    public RegistrationResultDto lookupMemberById(@NotNull @FormParam("nickname") String nickname) {
-        return registrationService.lookupMemberById(nickname);
-    }
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public RegistrationDto currentLogin() {
+		return registrationService.currentLogin();
+	}
 
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public RegistrationDto currentLogin() {
-        return registrationService.currentLogin();
-    }
-
-    @DELETE
-    @Produces(MediaType.APPLICATION_JSON)
-    public RegistrationDto logout() {
-        return registrationService.logout();
-    }
+	@DELETE
+	@Produces(MediaType.APPLICATION_JSON)
+	public RegistrationDto logout() {
+		return registrationService.logout();
+	}
 }
