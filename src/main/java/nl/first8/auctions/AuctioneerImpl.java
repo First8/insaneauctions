@@ -18,6 +18,9 @@ import nl.first8.model.Auction;
 import nl.first8.model.Bid;
 import nl.first8.model.Item;
 
+import org.wildfly.clustering.group.Group;
+import org.wildfly.clustering.group.Node;
+
 @Singleton
 public class AuctioneerImpl implements Auctioneer {
 	private static final Logger log = Logger.getLogger(AuctioneerImpl.class.getName());
@@ -30,6 +33,9 @@ public class AuctioneerImpl implements Auctioneer {
 
 	@Resource
 	private ManagedScheduledExecutorService executorService;
+
+	@Resource(lookup = "java:jboss/clustering/group/web")
+	private Group channelGroup;
 
 	@PostConstruct
 	private void startup() {
@@ -56,9 +62,22 @@ public class AuctioneerImpl implements Auctioneer {
 
 	@Override
 	public Auction closeAuction() {
-		Auction auction = getCurrentAuction();
-		auction.setDateClosed(new Date());
-		return newAuction();
+		log.info("Cluster view:");
+		List<Node> nodes = channelGroup.getNodes();
+
+		for (Node node : nodes) {
+			log.info(node.getName() + " " + node.getSocketAddress());
+		}
+
+		if (channelGroup.isCoordinator()) {
+			log.info("I am coordinator so closing auction and opening a new one:");
+			Auction auction = getCurrentAuction();
+			auction.setDateClosed(new Date());
+			return newAuction();
+		} else {
+			log.info("I am not the coordinator so not closing auction");
+			return getCurrentAuction();
+		}
 	}
 
 	@Override
