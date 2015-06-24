@@ -1,0 +1,9 @@
+#!/bin/bash
+mvn clean install
+if [ $? -eq 0 ]; then
+	mvn wildfly:undeploy -Dwildfly.port=9990
+	mvn wildfly:deploy -Dwildfly.port=9990
+	mvn wildfly:undeploy -Dwildfly.port=10090
+	mvn wildfly:deploy -Dwildfly.port=10090
+fi
+

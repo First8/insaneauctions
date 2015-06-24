@@ -1,0 +1,61 @@
+<template>
+    <div class="container box auction">
+        <div class="row">
+            <div class="col-lg-12 text-center">
+                <h3 class="white-outlined">Welcome user ${model.nickname}</h3>
+                <p>Item under auction:</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12 text-center">
+                <h3 class="white-outlined">${model.auction.item.name}</h3>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-6 col-lg-6">
+                <div class="image">
+                    <img class="img-responsive" src.bind="model.auction.item.imageUrl"/>
+                    <p><strong>${model.auction.item.description}</strong></p>
+                </div>
+            </div>
+            <div class="col-xs-6 col-lg-6">
+                <div class="timer">
+                    <h3 class="white-outlined">Time remaining</h3>
+                    <strong>${clock}</strong>
+                </div>
+                <div class="bids">
+                    <h3 class="white-outlined">Current bids</h3>
+                    <div class="bid" repeat.for="bid of model.auction.bids">
+                        <span class="amount">&euro; ${bid.amount.value}</span>
+                        <span class="bidder">${bid.bidderName}</span>
+                    </div>
+                </div>
+                <div class="bid-form">
+                    <h3 class="white-outlined">Enter bid</h3>
+                    <form role="form" submit.delegate="bid()">
+                        <div class="form-group">
+                            <input class="form-control" placeholder="Price" required="true" autofocus="true"
+                                   name="bidValue" type="text" value.bind="bidValue">
+                        </div>
+                        <button type="submit" class="btn btn-primary ${closed ? 'disabled':''}">${teaser}</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="row error ${model.error ? '':'hide'}">
+            <div class="col-xs-12">
+                <p>${model.error}</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="pull-left">
+                    Current auction-id: ${model.auction.id}
+                </div>
+                <div class="pull-right">
+                    <a href="/api/admin/index.html" target="_blank">Admin page</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

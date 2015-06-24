@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Test form for REST API</title>
+</head>
+<body>
+
+	<h1>Login</h1>
+	<form action="http://localhost:8080/api/register"
+		method="POST">
+		Nick name:<input type="text" name="nickname"> <input
+			type="submit">
+	</form>
+	<a href="http://localhost:8080/api/register">current login</a>
+
+	<h1>Bid</h1>
+	<form action="http://localhost:8080/api/auction"
+		method="POST">
+		Amount (EUR cents): <input type="text" name="value"> <input
+			type="submit">
+	</form>
+
+	<h1>View</h1>
+	<ul>
+
+		<li><a href="http://localhost:8080/api/auction">current
+				auction</a></li>
+		<li><a
+			href="http://localhost:8080/api/auction/bids">bids
+				on current auction</a></li>
+	</ul>
+
+</body>
+</html>

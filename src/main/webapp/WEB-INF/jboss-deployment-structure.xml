@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jboss-deployment-structure>
+    <deployment>
+        <dependencies>
+            <module name="org.jboss.msc" />
+            <module name="org.wildfly.clustering.singleton" />
+            <module name="org.jboss.as.server"/>
+            <module name="org.codehaus.jackson.jackson-mapper-asl"/>
+        </dependencies>
+    </deployment>
+</jboss-deployment-structure>

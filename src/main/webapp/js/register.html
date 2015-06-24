@@ -1,0 +1,12 @@
+<template>
+    <div class="box register">
+        <h3 class="white-outlined">Auction Registration</h3>
+        <form role="form" submit.delegate="register()">
+            <div class="form-group">
+                <input class="form-control" placeholder="Nickname" required="true" autofocus="true"
+                       name="nickname" type="text" value.bind="nickname">
+            </div>
+            <button type="submit" class="btn btn-danger">I am insane</button>
+        </form>
+    </div>
+</template>

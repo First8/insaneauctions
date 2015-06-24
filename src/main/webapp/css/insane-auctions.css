@@ -1,0 +1,79 @@
+body {
+    margin: 0;
+    background: url(../images/insane-wallpapers-hd.jpg) no-repeat top right;
+}
+
+.white-outlined {
+    color: #ffffff;
+    text-shadow: rgba(0, 0, 0, 1) 0 0 2px;
+}
+
+.splash {
+    text-align: center;
+    margin: 10% 0 0 0;
+    box-sizing: border-box;
+}
+
+.splash .message {
+    color: #ffffff;
+    font-size: 72px;
+    line-height: 72px;
+    text-shadow: rgba(255, 255, 255, 0.5) 0 0 20px;
+    text-transform: uppercase;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.splash .fa-spinner {
+    color: #ffffff;
+    text-align: center;
+    display: inline-block;
+    font-size: 72px;
+    margin-top: 50px;
+}
+
+.box {
+    box-sizing: border-box;
+    background: rgba(255, 153, 0, 0.5) none repeat scroll 0 0;
+    border: 5px solid #ffffff;
+    border-radius: 10px;
+}
+
+.register {
+    padding: 10px;
+    text-align: center;
+    margin: 10% 40%;
+}
+
+.register h3 {
+    text-transform: capitalize;
+}
+
+.register button {
+    text-transform: uppercase;
+}
+
+.auction {
+    padding: 10px;
+    margin-top: 10%;
+}
+
+div.image {
+    max-width: 325px;
+}
+
+div.image img {
+	margin: 20px 10px 10px 10px;
+}
+
+div.image p {
+	margin: 0px 10px 10px 10px;
+}
+
+div.error {
+	color: red;
+	font-weight: bolder;
+}
+
+div.hide {
+	visibility: non;
+}
