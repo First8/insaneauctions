@@ -22,8 +22,6 @@ import nl.first8.model.Item;
 public class AuctioneerImpl implements Auctioneer {
 	private static final Logger log = Logger.getLogger(AuctioneerImpl.class.getName());
 
-	private long currentAuctionId;
-
 	@Inject
 	private AuctionRepository auctionRepository;
 
@@ -35,13 +33,8 @@ public class AuctioneerImpl implements Auctioneer {
 
 	@PostConstruct
 	private void startup() {
-		currentAuctionId = newAuction().getId();
-		log.info("Starting up, auctioning a new auction: " + currentAuctionId);
-	}
-
-	public long getCurrentAuctionId() {
-		log.info("Current auction id: " + currentAuctionId);
-		return currentAuctionId;
+		long newAuction = newAuction().getId();
+		log.info("Starting up, auctioning a new auction: " + newAuction);
 	}
 
 	private Auction newAuction() {
@@ -53,9 +46,7 @@ public class AuctioneerImpl implements Auctioneer {
 		Date dateEnd = new Date(dateStart.getTime() + item.getAuctionTime());
 
 		Auction auction = auctionRepository.persist(new Auction(item, dateStart, dateEnd));
-		this.currentAuctionId = auction.getId();
-		log.info("New auction started for item id " + auction.getItem().getId() + ": " + currentAuctionId
-				+ ", schedule " + item.getAuctionTime() + "ms to cancel");
+		log.info("New auction started for item id " + auction.getItem().getId() + ": " + auction.getId());
 
 		// unfortunately we cannot use () -> closeAuction() here due to tx scope
 		executorService.schedule(closeAuctionTask, item.getAuctionTime(), TimeUnit.MILLISECONDS);
@@ -72,8 +63,9 @@ public class AuctioneerImpl implements Auctioneer {
 
 	@Override
 	public Auction getCurrentAuction() {
-		long currentAuctionId = getCurrentAuctionId();
-		return auctionRepository.findAuctionById(currentAuctionId);
+		Auction auction = auctionRepository.findLatestAuction();
+		log.info("Current auction id: " + auction.getId());
+		return auction;
 	}
 
 	@Override
