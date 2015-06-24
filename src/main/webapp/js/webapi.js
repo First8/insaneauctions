@@ -19,7 +19,35 @@ export class WebAPI {
         this.socket = null;
     }
 
+    // websocket init stuff.
     initWS() {
+        if (this.socket != null && this.socket.readyState == 1) {
+            return;
+        } else {
+            // ugly, check if we are on openshift, as websockets support is on port 8000?!?! /sigh
+            if( window.location.hostname.indexOf('rhcloud.com') > -1 ) {
+                this.socket = new WebSocket("ws://" + window.location.hostname + ":8000/ws/actions");
+            } else {
+                this.socket = new WebSocket("ws://" + window.location.host + "/ws/actions");
+            }
+            this.socket.onopen = e => {
+                console.log('onopen', e)
+                this.currentAuction();
+            }
+            this.socket.onerror = e => {
+                console.log('onerror', e)
+            }
+            this.socket.onclose = e => {
+                console.log('onclose', e)
+                // pretty ugly ... but firefox is a bitch
+                this.publishEvent({event: 'http-error', message: 'No HTTP connection'});
+                this.initWS();
+            }
+            this.socket.onmessage = evt => {
+                var dto = JSON.parse(evt.data);
+                this.ea.publish('events', dto);
+            }
+        }
     }
     
     registered() {
@@ -38,27 +66,6 @@ export class WebAPI {
         this.http.get('api/auction')
             .then(response => JSON.parse(response.response))
             .then(dto => this.publishEvent(dto));
-    }
-
-    watchAuction(interval) {
-        clearInterval(this.timer);
-        this.timer = setInterval(() => {
-            this.http.get('api/auction')
-                .then(response => {
-                        if (response.statusCode != 200) {
-                            console.log('Error contacting server');
-                            return {event: 'http-error', message: 'No HTTP connection'};
-                        } else {
-                            return JSON.parse(response.response);
-                        }
-                    }, error => {
-                        console.log('A real error contacting server');
-                        console.log(error);
-                        return {event: 'http-error', message: 'No HTTP connection'};
-                    })
-                .then(dto => this.publishEvent(dto), error => {
-                })
-        }, interval);
     }
 
     bid(value) {

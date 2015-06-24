@@ -36,8 +36,6 @@ export class Auction {
             this.handleBid(dto);
         });
         this.countdown.setTargetRemaining(this.model.auction.timeRemaining);
-//        this.countdown.start(this.model.auction.timeRemaining, () => { this.clock = this.countdown.time() });
-        this.webapi.watchAuction(1000);
     }
 
     deactivate() {
