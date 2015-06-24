@@ -46,9 +46,11 @@ public class Auction {
 	private Date dateClosed;
 
 	public Auction() {
+		bids = new ArrayList<Bid>();
 	}
 
 	public Auction(Item item, Date dateStart, Date dateEnd) {
+		this();
 		item.addAuction(this);
 		this.dateCreated = dateStart;
 		this.dateEnd = dateEnd;
