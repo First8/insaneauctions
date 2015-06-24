@@ -11,12 +11,10 @@
         <extension module="org.jboss.as.jaxrs"/>
         <extension module="org.jboss.as.jdr"/>
         <extension module="org.jboss.as.jmx"/>
-        <extension module="org.jboss.as.jpa"/>
         <extension module="org.jboss.as.jsr77"/>
+        <extension module="org.jboss.as.jpa"/>
         <extension module="org.jboss.as.logging"/>
         <extension module="org.jboss.as.mail"/>
-        <extension module="org.jboss.as.messaging"/>
-        <extension module="org.jboss.as.modcluster"/>
         <extension module="org.jboss.as.naming"/>
         <extension module="org.jboss.as.pojo"/>
         <extension module="org.jboss.as.remoting"/>
@@ -29,6 +27,7 @@
         <extension module="org.wildfly.extension.io"/>
         <extension module="org.wildfly.extension.undertow"/>
     </extensions>
+
     <management>
         <security-realms>
             <security-realm name="ManagementRealm">
@@ -131,7 +130,7 @@
                 <in-memory/>
             </job-repository>
             <thread-pool>
-                <max-threads count="10"/>
+                <max-threads count="3"/>
                 <keepalive-time time="30" unit="seconds"/>
             </thread-pool>
         </subsystem>
@@ -193,7 +192,7 @@
             </datasources>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:deployment-scanner:2.0">
-            <deployment-scanner path="deployments" relative-to="jboss.server.base.dir" scan-interval="5000" runtime-failure-causes-rollback="${jboss.deployment.scanner.rollback.on.failure:false}"/>
+            <deployment-scanner path="deployments" relative-to="jboss.server.base.dir" scan-interval="5000"/>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:ee:2.0">
             <spec-descriptor-property-replacement>false</spec-descriptor-property-replacement>
@@ -225,8 +224,8 @@
             <pools>
                 <bean-instance-pools>
                     <!-- A sample strict max pool configuration -->
-                    <strict-max-pool name="slsb-strict-max-pool" max-pool-size="20" instance-acquisition-timeout="5" instance-acquisition-timeout-unit="MINUTES"/>
-                    <strict-max-pool name="mdb-strict-max-pool" max-pool-size="20" instance-acquisition-timeout="5" instance-acquisition-timeout-unit="MINUTES"/>
+                    <strict-max-pool name="slsb-strict-max-pool" max-pool-size="3" instance-acquisition-timeout="5" instance-acquisition-timeout-unit="MINUTES"/>
+                    <strict-max-pool name="mdb-strict-max-pool" max-pool-size="3" instance-acquisition-timeout="5" instance-acquisition-timeout-unit="MINUTES"/>
                 </bean-instance-pools>
             </pools>
             <caches>
@@ -245,7 +244,7 @@
             <remote connector-ref="http-remoting-connector" thread-pool-name="default"/>
             <thread-pools>
                 <thread-pool name="default">
-                    <max-threads count="10"/>
+                    <max-threads count="3"/>
                     <keepalive-time time="100" unit="milliseconds"/>
                 </thread-pool>
             </thread-pools>
@@ -258,6 +257,12 @@
             <buffer-pool name="default"/>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:infinispan:2.0">
+            <cache-container name="cdi" default-cache="default">
+                <transport lock-timeout="60000"/>
+                <replicated-cache name="default" batching="true" mode="SYNC">
+                    <locking isolation="REPEATABLE_READ"/>
+                </replicated-cache>
+            </cache-container>
             <cache-container name="server" aliases="singleton cluster" default-cache="default" module="org.wildfly.clustering.server">
                 <transport lock-timeout="60000"/>
                 <replicated-cache name="default" mode="SYNC" batching="true">
@@ -300,41 +305,32 @@
             <bean-validation enabled="true"/>
             <default-workmanager>
                 <short-running-threads>
-                    <core-threads count="50"/>
+                    <core-threads count="3"/>
                     <queue-length count="50"/>
-                    <max-threads count="50"/>
+                    <max-threads count="3"/>
                     <keepalive-time time="10" unit="seconds"/>
                 </short-running-threads>
                 <long-running-threads>
-                    <core-threads count="50"/>
+                    <core-threads count="3"/>
                     <queue-length count="50"/>
-                    <max-threads count="50"/>
+                    <max-threads count="3"/>
                     <keepalive-time time="10" unit="seconds"/>
                 </long-running-threads>
             </default-workmanager>
             <cached-connection-manager/>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:jdr:1.0"/>
-        <subsystem xmlns="urn:jboss:domain:jgroups:2.0" default-stack="udp">
-            <stack name="udp">
-                <transport type="UDP" socket-binding="jgroups-udp"/>
-                <protocol type="PING"/>
-                <protocol type="MERGE3"/>
-                <protocol type="FD_SOCK" socket-binding="jgroups-udp-fd"/>
-                <protocol type="FD_ALL"/>
-                <protocol type="VERIFY_SUSPECT"/>
-                <protocol type="pbcast.NAKACK2"/>
-                <protocol type="UNICAST3"/>
-                <protocol type="pbcast.STABLE"/>
-                <protocol type="pbcast.GMS"/>
-                <protocol type="UFC"/>
-                <protocol type="MFC"/>
-                <protocol type="FRAG2"/>
-                <protocol type="RSVP"/>
-            </stack>
+        <subsystem xmlns="urn:jboss:domain:jgroups:2.0" default-stack="tcp">
             <stack name="tcp">
                 <transport type="TCP" socket-binding="jgroups-tcp"/>
-                <protocol type="MPING" socket-binding="jgroups-mping"/>
+                <!-- openshift does not allow multicast, using TCPPING -->
+                <!-- <protocol type="MPING" socket-binding="jgroups-mping"/> -->
+                <protocol type="TCPPING">
+                    <!-- this property has the initial hosts we need to form a cluster -->
+                    <property name="initial_hosts">${env.OPENSHIFT_WILDFLY_CLUSTER}</property>
+                    <property name="port_range">0</property>
+                    <property name="timeout">2000</property>
+                </protocol>
                 <protocol type="MERGE2"/>
                 <protocol type="FD_SOCK" socket-binding="jgroups-tcp-fd"/>
                 <protocol type="FD"/>
@@ -342,6 +338,13 @@
                 <protocol type="pbcast.NAKACK2"/>
                 <protocol type="UNICAST3"/>
                 <protocol type="pbcast.STABLE"/>
+                <!--
+                <protocol type="AUTH">
+                    <property name="auth_class">org.jgroups.auth.MD5Token</property>
+                    <property name="token_hash">SHA</property>
+                    <property name="auth_value">${env.OPENSHIFT_APP_UUID}</property>
+                </protocol>
+                -->
                 <protocol type="pbcast.GMS"/>
                 <protocol type="MFC"/>
                 <protocol type="FRAG2"/>
@@ -361,118 +364,6 @@
             <mail-session name="default" jndi-name="java:jboss/mail/Default">
                 <smtp-server outbound-socket-binding-ref="mail-smtp"/>
             </mail-session>
-        </subsystem>
-        <subsystem xmlns="urn:jboss:domain:messaging:2.0">
-            <hornetq-server>
-                <cluster-password>insaneauctions</cluster-password>
-                <journal-file-size>102400</journal-file-size>
-                <connectors>
-                    <http-connector name="http-connector" socket-binding="http">
-                        <param key="http-upgrade-endpoint" value="http-acceptor"/>
-                    </http-connector>
-                    <http-connector name="http-connector-throughput" socket-binding="http">
-                        <param key="http-upgrade-endpoint" value="http-acceptor-throughput"/>
-                        <param key="batch-delay" value="50"/>
-                    </http-connector>
-                    <in-vm-connector name="in-vm" server-id="0"/>
-                </connectors>
-                <acceptors>
-                    <http-acceptor name="http-acceptor" http-listener="default"/>
-                    <http-acceptor name="http-acceptor-throughput" http-listener="default">
-                        <param key="batch-delay" value="50"/>
-                        <param key="direct-deliver" value="false"/>
-                    </http-acceptor>
-                    <in-vm-acceptor name="in-vm" server-id="0"/>
-                </acceptors>
-                <broadcast-groups>
-                    <broadcast-group name="bg-group1">
-                        <socket-binding>messaging-group</socket-binding>
-                        <connector-ref>http-connector</connector-ref>
-                    </broadcast-group>
-                </broadcast-groups>
-                <discovery-groups>
-                    <discovery-group name="dg-group1">
-                        <socket-binding>messaging-group</socket-binding>
-                    </discovery-group>
-                </discovery-groups>
-                <cluster-connections>
-                    <cluster-connection name="insaneauctions">
-                        <address>jms</address>
-                        <connector-ref>http-connector</connector-ref>
-                        <discovery-group-ref discovery-group-name="dg-group1"/>
-                    </cluster-connection>
-                </cluster-connections>
-                <security-settings>
-                    <security-setting match="#">
-                        <permission type="send" roles="guest"/>
-                        <permission type="consume" roles="guest"/>
-                        <permission type="createNonDurableQueue" roles="guest"/>
-                        <permission type="deleteNonDurableQueue" roles="guest"/>
-                    </security-setting>
-                </security-settings>
-                <address-settings>
-                    <!--default for catch all-->
-                    <address-setting match="#">
-                        <dead-letter-address>jms.queue.DLQ</dead-letter-address>
-                        <expiry-address>jms.queue.ExpiryQueue</expiry-address>
-                        <redistribution-delay>1000</redistribution-delay>
-                        <max-size-bytes>10485760</max-size-bytes>
-                        <page-size-bytes>2097152</page-size-bytes>
-                        <message-counter-history-day-limit>10</message-counter-history-day-limit>
-                    </address-setting>
-                </address-settings>
-                <jms-connection-factories>
-                    <connection-factory name="InVmConnectionFactory">
-                        <connectors>
-                            <connector-ref connector-name="in-vm"/>
-                        </connectors>
-                        <entries>
-                            <entry name="java:/ConnectionFactory"/>
-                        </entries>
-                    </connection-factory>
-                    <connection-factory name="RemoteConnectionFactory">
-                        <connectors>
-                            <connector-ref connector-name="http-connector"/>
-                        </connectors>
-                        <entries>
-                            <entry name="java:jboss/exported/jms/RemoteConnectionFactory"/>
-                        </entries>
-                        <ha>true</ha>
-                        <block-on-acknowledge>true</block-on-acknowledge>
-                        <reconnect-attempts>-1</reconnect-attempts>
-                    </connection-factory>
-                    <pooled-connection-factory name="hornetq-ra">
-                        <transaction mode="xa"/>
-                        <connectors>
-                            <connector-ref connector-name="in-vm"/>
-                        </connectors>
-                        <entries>
-                            <entry name="java:/JmsXA"/>
-                            <!-- Global JNDI entry used to provide a default JMS Connection factory to EE application -->
-                            <entry name="java:jboss/DefaultJMSConnectionFactory"/>
-                        </entries>
-                    </pooled-connection-factory>
-                </jms-connection-factories>
-                <jms-destinations>
-                    <jms-queue name="ExpiryQueue">
-                        <entry name="java:/jms/queue/ExpiryQueue"/>
-                    </jms-queue>
-                    <jms-queue name="DLQ">
-                        <entry name="java:/jms/queue/DLQ"/>
-                    </jms-queue>
-                    <jms-topic name="insaneauctions">
-                        <entry name="jms/topic/insaneauctions"/>
-                        <entry name="java:jboss/exported/jms/topic/insaneauctions"/>
-                    </jms-topic>
-                </jms-destinations>
-            </hornetq-server>
-        </subsystem>
-        <subsystem xmlns="urn:jboss:domain:modcluster:1.2">
-            <mod-cluster-config advertise-socket="modcluster" connector="ajp">
-                <dynamic-load-provider>
-                    <load-metric type="cpu"/>
-                </dynamic-load-provider>
-            </mod-cluster-config>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:naming:2.0">
             <remote-naming/>
@@ -540,7 +431,7 @@
             </filters>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:webservices:1.2">
-            <wsdl-host>${jboss.bind.address:127.0.0.1}</wsdl-host>
+            <wsdl-host>${env.OPENSHIFT_WILDFLY_IP}</wsdl-host>
             <endpoint-config name="Standard-Endpoint-Config"/>
             <endpoint-config name="Recording-Endpoint-Config">
                 <pre-handler-chain name="recording-handlers" protocol-bindings="##SOAP11_HTTP ##SOAP11_HTTP_MTOM ##SOAP12_HTTP ##SOAP12_HTTP_MTOM">
@@ -553,10 +444,10 @@
     </profile>
     <interfaces>
         <interface name="management">
-            <inet-address value="${jboss.bind.address.management:127.0.0.1}"/>
+            <inet-address value="${env.OPENSHIFT_WILDFLY_IP}"/>
         </interface>
         <interface name="public">
-            <inet-address value="${jboss.bind.address:127.0.0.1}"/>
+            <inet-address value="${env.OPENSHIFT_WILDFLY_IP}"/>
         </interface>
         <!-- TODO - only show this if the jacorb subsystem is added  -->
         <interface name="unsecure">
@@ -564,19 +455,19 @@
               ~  Used for IIOP sockets in the standard configuration.
               ~                  To secure JacORB you need to setup SSL
               -->
-            <inet-address value="${jboss.bind.address.unsecure:127.0.0.1}"/>
+            <inet-address value="${env.OPENSHIFT_WILDFLY_IP}"/>
         </interface>
     </interfaces>
     <socket-binding-group name="standard-sockets" default-interface="public" port-offset="${jboss.socket.binding.port-offset:0}">
-        <socket-binding name="management-http" interface="management" port="${jboss.management.http.port:9990}"/>
+        <socket-binding name="management-http" interface="management" port="${env.OPENSHIFT_WILDFLY_MANAGEMENT_HTTP_PORT}"/>
         <socket-binding name="management-https" interface="management" port="${jboss.management.https.port:9993}"/>
         <socket-binding name="ajp" port="${jboss.ajp.port:8009}"/>
-        <socket-binding name="http" port="${jboss.http.port:8080}"/>
+        <socket-binding name="http" port="${env.OPENSHIFT_WILDFLY_HTTP_PORT}"/>
         <socket-binding name="https" port="${jboss.https.port:8443}"/>
         <socket-binding name="jacorb" interface="unsecure" port="3528"/>
         <socket-binding name="jacorb-ssl" interface="unsecure" port="3529"/>
         <socket-binding name="jgroups-mping" port="0" multicast-address="${jboss.default.multicast.address:230.0.0.4}" multicast-port="45700"/>
-        <socket-binding name="jgroups-tcp" port="7600"/>
+        <socket-binding name="jgroups-tcp" port="${env.OPENSHIFT_WILDFLY_CLUSTER_PORT}"/>
         <socket-binding name="jgroups-tcp-fd" port="57600"/>
         <socket-binding name="jgroups-udp" port="55200" multicast-address="${jboss.default.multicast.address:230.0.0.4}" multicast-port="45688"/>
         <socket-binding name="jgroups-udp-fd" port="54200"/>
