@@ -31,7 +31,6 @@ class RegisteredStep {
         // this includes child routes.
         if (routingContext.nextInstructions.some(i => i.config.auth)) {
             if (!this.model.loaded()) {
-                console.log('redirect -> connect');
                 return next.cancel(new Redirect('connect'));
             }
         }

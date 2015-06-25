@@ -36,7 +36,6 @@ export class Auction {
             this.handleBid(dto);
         });
         this.countdown.setTargetRemaining(this.model.auction.timeRemaining);
-//        this.countdown.start(this.model.auction.timeRemaining, () => { this.clock = this.countdown.time() });
         this.webapi.watchAuction(1000);
     }
 
@@ -49,8 +48,6 @@ export class Auction {
             this.model.error = null;
             return;
         }
-        console.log(dto);
-        console.log('We have an error message:' + dto.message);
         this.model.error = dto.message;
     }
 

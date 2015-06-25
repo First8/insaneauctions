@@ -46,14 +46,11 @@ export class WebAPI {
             this.http.get('api/auction')
                 .then(response => {
                         if (response.statusCode != 200) {
-                            console.log('Error contacting server');
                             return {event: 'http-error', message: 'No HTTP connection'};
                         } else {
                             return JSON.parse(response.response);
                         }
                     }, error => {
-                        console.log('A real error contacting server');
-                        console.log(error);
                         return {event: 'http-error', message: 'No HTTP connection'};
                     })
                 .then(dto => this.publishEvent(dto), error => {
