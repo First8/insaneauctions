@@ -1,6 +1,6 @@
 package nl.first8.cluster;
 
-import nl.first8.auctions.AuctionEvent;
+import nl.first8.push.AuctionEvent;
 
 import javax.ejb.Local;
 

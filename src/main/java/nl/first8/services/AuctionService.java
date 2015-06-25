@@ -1,17 +1,5 @@
 package nl.first8.services;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.logging.Logger;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.event.Event;
-import javax.enterprise.event.Observes;
-import javax.inject.Inject;
-
-import nl.first8.push.AuctionEvent;
-import nl.first8.push.AuctionUpdated;
 import nl.first8.auctions.Auctioneer;
 import nl.first8.auctions.BidDeniedException;
 import nl.first8.auctions.BidDeniedException.Reason;
@@ -19,7 +7,18 @@ import nl.first8.data.AuctionRepository;
 import nl.first8.model.Amount;
 import nl.first8.model.Auction;
 import nl.first8.model.Bid;
+import nl.first8.push.AuctionEvent;
+import nl.first8.push.AuctionUpdated;
 import nl.first8.push.PushService;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.event.Event;
+import javax.enterprise.event.Observes;
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.logging.Logger;
 
 @ApplicationScoped
 public class AuctionService {
@@ -41,7 +40,6 @@ public class AuctionService {
 	private Event<AuctionEvent> auctionUpdatedEvent;
 
 	public void onAuctionClosed(@Observes @AuctionUpdated AuctionEvent auctionEvent) {
-		log.info("Received auction updated event.");
 		pushService.push(getActiveAuction());
 	}
 
