@@ -1,6 +1,8 @@
 package nl.first8.services;
 
-public class EventDto {
+import java.io.Serializable;
+
+public class EventDto implements Serializable {
 
     private String event;
 

@@ -1,10 +1,8 @@
 package nl.first8.auctions;
 
-import java.util.logging.Logger;
-
 import javax.enterprise.context.Dependent;
-import javax.enterprise.event.Event;
 import javax.inject.Inject;
+import java.util.logging.Logger;
 
 @Dependent
 public class CloseAuctionTask implements Runnable {
@@ -13,15 +11,9 @@ public class CloseAuctionTask implements Runnable {
 	@Inject
 	private Auctioneer auctioneer;
 
-	@Inject
-	@AuctionUpdated
-	private Event<AuctionEvent> auctionUpdatedEvent;
-
 	@Override
 	public void run() {
 		log.info("Closing auction");
 		auctioneer.closeAuction();
-		log.info("Fire auction updated event.");
-		auctionUpdatedEvent.fire(new AuctionEvent());
 	}
 }
