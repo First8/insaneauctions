@@ -13,6 +13,8 @@ import javax.enterprise.event.Event;
 import javax.inject.Inject;
 
 import nl.first8.model.Auction;
+import nl.first8.push.AuctionEvent;
+import nl.first8.push.AuctionUpdated;
 
 @Singleton
 public class AuctionCloserImpl implements AuctionCloser {

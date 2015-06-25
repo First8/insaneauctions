@@ -1,4 +1,4 @@
-package nl.first8.auctions;
+package nl.first8.push;
 
 import javax.inject.Qualifier;
 import java.lang.annotation.ElementType;

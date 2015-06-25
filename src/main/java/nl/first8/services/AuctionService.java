@@ -10,8 +10,8 @@ import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
-import nl.first8.auctions.AuctionEvent;
-import nl.first8.auctions.AuctionUpdated;
+import nl.first8.push.AuctionEvent;
+import nl.first8.push.AuctionUpdated;
 import nl.first8.auctions.Auctioneer;
 import nl.first8.auctions.BidDeniedException;
 import nl.first8.auctions.BidDeniedException.Reason;
@@ -19,6 +19,7 @@ import nl.first8.data.AuctionRepository;
 import nl.first8.model.Amount;
 import nl.first8.model.Auction;
 import nl.first8.model.Bid;
+import nl.first8.push.PushService;
 
 @ApplicationScoped
 public class AuctionService {

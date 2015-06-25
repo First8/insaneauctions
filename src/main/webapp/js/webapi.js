@@ -19,7 +19,6 @@ export class WebAPI {
         this.socket = null;
     }
 
-    // websocket init stuff.
     initWS() {
         if (this.socket != null && this.socket.readyState == 1) {
             return;
