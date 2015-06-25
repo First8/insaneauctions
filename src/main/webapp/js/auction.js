@@ -28,7 +28,6 @@ export class Auction {
     }
 
     activate() {
-    	console.log("active auction view");
         this.dispose = this.ea.subscribe('events', dto => {
             console.log('event', dto);
             this.handleError(dto);
