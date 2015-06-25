@@ -1,13 +1,12 @@
 package nl.first8.services;
 
-import java.util.Date;
-import java.util.logging.Logger;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.servlet.http.HttpSession;
-
-import org.apache.commons.lang3.StringUtils;
+import java.util.Date;
+import java.util.logging.Logger;
 
 @ApplicationScoped
 public class RegistrationService {
@@ -19,9 +18,6 @@ public class RegistrationService {
 
     @Inject
     private HttpSession session;
-
-    @Inject
-    private PushService clientService;
 
     public RegistrationResultDto lookupMemberById(String nickname) {
         Date date = new Date();

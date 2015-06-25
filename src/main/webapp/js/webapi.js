@@ -16,12 +16,8 @@ export class WebAPI {
         this.http.configure(x => {
             x.withHeader("Content-Type", "application/x-www-form-urlencoded");
         });
-        this.socket = null;
     }
 
-    initWS() {
-    }
-    
     registered() {
         this.http.get('api/register')
             .then(response => JSON.parse(response.response))
