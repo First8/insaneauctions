@@ -19,9 +19,6 @@ export class WebAPI {
         this.socket = null;
     }
 
-    initWS() {
-    }
-    
     registered() {
         this.http.get('api/register')
             .then(response => JSON.parse(response.response))

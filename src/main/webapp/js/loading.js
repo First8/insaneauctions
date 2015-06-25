@@ -38,7 +38,6 @@ export class Loading {
         }
 
         if(dto.loggedIn && dto.nickname != null ) {
-            this.webapi.initWS();
             this.model.nickname = dto.nickname;
             this.webapi.currentAuction();
         } else {
