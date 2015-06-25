@@ -1,4 +1,4 @@
-package nl.first8.services;
+package nl.first8.push;
 
 import java.io.IOException;
 import java.util.Collections;

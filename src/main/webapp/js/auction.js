@@ -47,8 +47,6 @@ export class Auction {
             this.model.error = null;
             return;
         }
-        console.log(dto);
-        console.log('We have an error message:' + dto.message);
         this.model.error = dto.message;
     }
 

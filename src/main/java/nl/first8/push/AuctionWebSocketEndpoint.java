@@ -1,21 +1,13 @@
-package nl.first8.ws;
+package nl.first8.push;
 
+import javax.inject.Inject;
+import javax.websocket.*;
+import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.inject.Inject;
-import javax.websocket.EndpointConfig;
-import javax.websocket.OnClose;
-import javax.websocket.OnError;
-import javax.websocket.OnMessage;
-import javax.websocket.OnOpen;
-import javax.websocket.Session;
-import javax.websocket.server.ServerEndpoint;
-
-import nl.first8.services.PushService;
-
-@ServerEndpoint(value = "/ws/actions", configurator = GetHttpSessionConfigurator.class)
+@ServerEndpoint(value = "/ws/actions")
 public class AuctionWebSocketEndpoint {
 
 	private static final Logger log = Logger.getLogger(AuctionWebSocketEndpoint.class.getName());

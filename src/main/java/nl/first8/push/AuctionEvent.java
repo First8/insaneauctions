@@ -1,4 +1,4 @@
-package nl.first8.auctions;
+package nl.first8.push;
 
 import java.time.LocalDateTime;
 

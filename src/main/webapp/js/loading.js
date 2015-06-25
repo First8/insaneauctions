@@ -18,7 +18,6 @@ export class Loading {
     }
 
     activate() {
-        console.log('activating loading view.');
         this.dispose = this.ea.subscribe('events', dto => {
             console.log('event', dto);
             this.handleRegistered(dto);
@@ -41,11 +40,9 @@ export class Loading {
         if(dto.loggedIn && dto.nickname != null ) {
             this.webapi.initWS();
             this.model.nickname = dto.nickname;
-            console.log('loading auction and to auction view.');
             this.webapi.currentAuction();
         } else {
             this.model.reset();
-            console.log('forwarding to register view.');
             this.router.navigate("register");
         }
     }
@@ -54,7 +51,6 @@ export class Loading {
         if( dto.event != 'auction') {
             return;
         }
-
         this.model.auction = dto;
         this.router.navigate("auction");
     }

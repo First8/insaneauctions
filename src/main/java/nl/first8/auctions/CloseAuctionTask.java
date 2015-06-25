@@ -1,5 +1,8 @@
 package nl.first8.auctions;
 
+import nl.first8.push.AuctionEvent;
+import nl.first8.push.AuctionUpdated;
+
 import java.util.logging.Logger;
 
 import javax.enterprise.context.Dependent;
