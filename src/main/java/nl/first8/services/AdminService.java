@@ -1,12 +1,11 @@
 package nl.first8.services;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import nl.first8.data.AuctionRepository;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
-
-import nl.first8.data.AuctionRepository;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RequestScoped
 public class AdminService {
@@ -40,6 +39,13 @@ public class AdminService {
 		sb.append("<br>created: " + a.getDateCreated());
 		sb.append("<br>end:     " + a.getDateEnd());
 		sb.append("<br>closed:  " + a.getDateClosed());
+
+		if (a.getDateEnd() != null && a.getDateClosed() != null) {
+			long diff = (a.getDateEnd().getTime() - a.getDateClosed().getTime());
+			if (Math.abs(diff) > 1000) {
+				sb.append("<span style='color:red'> End and closed date are too far off: " + diff + "ms</span>");
+			}
+		}
 
 		BidDto previousBid = null;
 		sb.append("<ol>");

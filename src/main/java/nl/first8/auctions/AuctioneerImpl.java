@@ -1,22 +1,21 @@
 package nl.first8.auctions;
 
-import java.util.Date;
-import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
+import nl.first8.data.AuctionRepository;
+import nl.first8.model.Amount;
+import nl.first8.model.Auction;
+import nl.first8.model.Bid;
+import nl.first8.model.Item;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.ejb.Singleton;
 import javax.enterprise.concurrent.ManagedScheduledExecutorService;
 import javax.inject.Inject;
-
-import nl.first8.data.AuctionRepository;
-import nl.first8.model.Amount;
-import nl.first8.model.Auction;
-import nl.first8.model.Bid;
-import nl.first8.model.Item;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
 @Singleton
 public class AuctioneerImpl implements Auctioneer {
@@ -37,11 +36,6 @@ public class AuctioneerImpl implements Auctioneer {
 	private void startup() {
 		currentAuctionId = newAuction().getId();
 		log.info("Starting up, auctioning a new auction: " + currentAuctionId);
-	}
-
-	public long getCurrentAuctionId() {
-		log.info("Current auction id: " + currentAuctionId);
-		return currentAuctionId;
 	}
 
 	private Auction newAuction() {
@@ -72,7 +66,6 @@ public class AuctioneerImpl implements Auctioneer {
 
 	@Override
 	public Auction getCurrentAuction() {
-		long currentAuctionId = getCurrentAuctionId();
 		return auctionRepository.findAuctionById(currentAuctionId);
 	}
 
